@@ -164,7 +164,9 @@ export function Checkout() {
                 <span>Total</span>
                 <span>R$ 33,20</span>
               </TotalCheckout>
-              <button>confirmar pedido</button>
+              <a href="/success">
+                <button>confirmar pedido</button>
+              </a>
             </ProductsSideFooter>
           </ProductsSide>
         </div>

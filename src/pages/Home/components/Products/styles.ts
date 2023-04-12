@@ -90,8 +90,7 @@ export const ProductsInsertInCart = styled.button`
   transition: background 0.2s, color 0.2s;
 
   :hover {
-    background: ${(props) => props.theme['purple-200']};
-    color: ${(props) => props.theme['purple-700']};
+    background: ${(props) => props.theme['purple-500']};
     cursor: pointer;
   }
 `

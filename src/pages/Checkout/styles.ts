@@ -1,12 +1,12 @@
 import styled from 'styled-components'
 
 export const CheckoutContainer = styled.div`
-  width: 82.5rem;
-  padding: 2rem 0;
+  width: calc(82.5rem - 4rem);
+  padding: 2rem 2rem;
   margin: 0 auto;
 
   display: grid;
-  grid-template-columns: 1.5fr 1fr;
+  grid-template-columns: 1fr 0.7fr;
 
   gap: 2rem;
 
@@ -16,11 +16,16 @@ export const CheckoutContainer = styled.div`
   }
 
   @media (max-width: 1320px) {
-    width: 48rem;
+    width: calc(48rem - 4rem);
     grid-template-columns: 1fr;
   }
   @media (max-width: 768px) {
-    width: 100%;
+    display: block;
+    width: calc(100% - 4rem);
+
+    > div {
+      margin-top: 2rem;
+    }
   }
 `
 
@@ -78,26 +83,46 @@ export const W1Field = styled.div`
   width: calc(10% - 0.75rem);
   text-align: center;
   margin: 0 0.375rem;
+
+  @media (max-width: 768px) {
+    display: contents;
+  }
 `
 
 export const W4Field = styled.div`
   width: calc(40% - 0.75rem);
   margin: 0 0.375rem;
+
+  @media (max-width: 768px) {
+    display: contents;
+  }
 `
 
 export const W5Field = styled.div`
   width: calc(50% - 0.75rem);
   margin: 0 0.375rem;
+
+  @media (max-width: 768px) {
+    display: contents;
+  }
 `
 
 export const W6Field = styled.div`
   width: calc(60% - 0.75rem);
   margin: 0 0.375rem;
+
+  @media (max-width: 768px) {
+    display: contents;
+  }
 `
 
 export const W10Field = styled.div`
   width: 100%;
   margin: 0 0.375rem;
+
+  @media (max-width: 768px) {
+    display: contents;
+  }
 `
 
 export const PaymentCheckout = styled.div`
@@ -137,6 +162,11 @@ export const PaymentsMethods = styled.div`
     background: ${(props) => props.theme['purple-200']};
     border: 1px solid ${(props) => props.theme['purple-500']};
   }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
 `
 export const ButtonMethod = styled.label`
   flex: 1;
@@ -175,6 +205,12 @@ export const ProductsSideFooter = styled.div`
   div {
     display: flex;
     justify-content: space-between;
+  }
+
+  a {
+    display: contents;
+    color: ${(props) => props.theme['base-white']};
+    text-transform: uppercase;
   }
 
   button {

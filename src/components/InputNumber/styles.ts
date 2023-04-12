@@ -26,5 +26,13 @@ export const InputContainer = styled.div`
     align-items: center;
     background: transparent;
     border: 0;
+
+    svg {
+      color: ${(props) => props.theme['purple-500']};
+    }
+
+    svg:hover {
+      color: ${(props) => props.theme['purple-700']};
+    }
   }
 `
