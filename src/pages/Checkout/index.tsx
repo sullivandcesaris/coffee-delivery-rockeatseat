@@ -24,9 +24,40 @@ import {
   W5Field,
   W6Field,
 } from './styles'
+import { useContext } from 'react'
+import { Product, ProductsContext } from '../../contexts/ProductsContext'
 
 export function Checkout() {
-  const { register, handleSubmit } = useForm()
+  const { productsInTheCart, products } = useContext(ProductsContext)
+  const { register } = useForm()
+
+  const productsWithQuantity = products?.map((product) => {
+    const productInCart = productsInTheCart.find(
+      (item) => item.productId === product.id,
+    )
+    if (productInCart) {
+      return { ...product, quantity: productInCart.productQuantity }
+    }
+    return null
+  })
+
+  let productsWithQuantityFiltered: any
+
+  if (productsWithQuantity) {
+    productsWithQuantityFiltered = productsWithQuantity?.filter(Boolean)
+  }
+
+  interface ProductsProps extends Product {
+    quantity: number
+  }
+
+  function calculateTotalPrice() {
+    let totalPrice = 0
+    productsWithQuantityFiltered.forEach((item: ProductsProps) => {
+      totalPrice += item.price * item.quantity
+    })
+    return totalPrice
+  }
 
   return (
     <>
@@ -120,7 +151,7 @@ export function Checkout() {
                 name="payment-method"
                 value="credit-card"
               />
-              <ButtonMethod for="creditCard">
+              <ButtonMethod htmlFor="creditCard">
                 <CreditCard size={22} /> cartão de crédito
               </ButtonMethod>
               <input
@@ -129,7 +160,7 @@ export function Checkout() {
                 name="payment-method"
                 value="debit-card"
               />
-              <ButtonMethod for="debitCard">
+              <ButtonMethod htmlFor="debitCard">
                 <Bank size={22} /> cartão de débito
               </ButtonMethod>
               <input
@@ -138,7 +169,7 @@ export function Checkout() {
                 name="payment-method"
                 value="money"
               />
-              <ButtonMethod for="money">
+              <ButtonMethod htmlFor="money">
                 <Money size={22} />
                 dinheiro
               </ButtonMethod>
@@ -148,13 +179,28 @@ export function Checkout() {
         <div>
           <h2>Cafés selecionados</h2>
           <ProductsSide>
-            <ProductCheckout />
-            <ProductCheckout />
-            <ProductCheckout />
+            {productsWithQuantityFiltered.length > 0 ? (
+              productsWithQuantityFiltered.map((product: ProductsProps) => {
+                return (
+                  <ProductCheckout
+                    key={product.id}
+                    id={product.id}
+                    image={product.image}
+                    categories={product.categories}
+                    name={product.name}
+                    description={product.description}
+                    price={product.price}
+                    quantityInTheCart={product.quantity}
+                  />
+                )
+              })
+            ) : (
+              <p>Não há itens no carrinho.</p>
+            )}
             <ProductsSideFooter>
               <div>
                 <span>Total de itens</span>
-                <span>R$ 29,70</span>
+                <span>R$ {calculateTotalPrice().toFixed(2)}</span>
               </div>
               <div>
                 <span>Entrega</span>
@@ -162,7 +208,7 @@ export function Checkout() {
               </div>
               <TotalCheckout>
                 <span>Total</span>
-                <span>R$ 33,20</span>
+                <span>R$ {(calculateTotalPrice() + 3.5).toFixed(2)}</span>
               </TotalCheckout>
               <a href="/success">
                 <button>confirmar pedido</button>

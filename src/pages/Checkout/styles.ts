@@ -2,7 +2,7 @@ import styled from 'styled-components'
 
 export const CheckoutContainer = styled.div`
   width: calc(82.5rem - 4rem);
-  padding: 2rem 2rem;
+  padding: 10rem 2rem 2rem 2rem;
   margin: 0 auto;
 
   display: grid;

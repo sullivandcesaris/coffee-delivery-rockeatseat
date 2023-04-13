@@ -3,12 +3,14 @@ import styled from 'styled-components'
 
 export const BackgroundImage = styled.div`
   background-image: url(${backgroundHome});
+  background-repeat: no-repeat;
+  background-size: cover;
 `
 
 export const BannerContainer = styled.div`
   width: 82.5rem;
   margin: auto;
-  padding: 5.75rem 0;
+  padding: 15.75rem 0;
 
   display: flex;
   gap: 3.5rem;

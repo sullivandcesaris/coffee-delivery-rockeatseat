@@ -3,7 +3,7 @@ import styled from 'styled-components'
 export const SuccessContainer = styled.div`
   width: calc(82.5rem - 4rem);
   margin: 0 auto;
-  padding: 5rem 0;
+  padding: 15rem 0;
 
   display: flex;
   flex-direction: row;
