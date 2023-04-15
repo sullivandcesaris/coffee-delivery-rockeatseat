@@ -72,7 +72,7 @@ export function Home() {
           {products?.map((product, index) => {
             return (
               <ProductsTemplate
-                key={product.id}
+                key={product.id + product.name}
                 id={product.id}
                 image={product.image}
                 categories={product.categories}

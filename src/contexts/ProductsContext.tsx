@@ -1,4 +1,4 @@
-import React, { ReactNode, createContext, useState } from 'react'
+import React, { ReactNode, createContext, useEffect, useReducer } from 'react'
 import ExpressoTradicional from '../assets/coffees/expresso.png'
 import ExpressoAmericano from '../assets/coffees/americano.png'
 import ExpressoCremoso from '../assets/coffees/expresso-cremoso.png'
@@ -13,6 +13,15 @@ import Cubano from '../assets/coffees/cubano.png'
 import Havaiano from '../assets/coffees/havaiano.png'
 import Arabe from '../assets/coffees/arabe.png'
 import Irlandes from '../assets/coffees/irlandes.png'
+
+export interface Product {
+  id: number
+  image: string
+  categories: string[]
+  name: string
+  description: string
+  price: number
+}
 
 const products = [
   {
@@ -133,6 +142,41 @@ const products = [
   },
 ]
 
+export interface BrazilianStates {
+  uf: string
+  name: string
+}
+
+const brazilianStates = [
+  { uf: 'AC', name: 'Acre' },
+  { uf: 'AL', name: 'Alagoas' },
+  { uf: 'AP', name: 'Amapá' },
+  { uf: 'AM', name: 'Amazonas' },
+  { uf: 'BA', name: 'Bahia' },
+  { uf: 'CE', name: 'Ceará' },
+  { uf: 'DF', name: 'Distrito Federal' },
+  { uf: 'ES', name: 'Espírito Santo' },
+  { uf: 'GO', name: 'Goiás' },
+  { uf: 'MA', name: 'Maranhão' },
+  { uf: 'MT', name: 'Mato Grosso' },
+  { uf: 'MS', name: 'Mato Grosso do Sul' },
+  { uf: 'MG', name: 'Minas Gerais' },
+  { uf: 'PA', name: 'Pará' },
+  { uf: 'PB', name: 'Paraíba' },
+  { uf: 'PR', name: 'Paraná' },
+  { uf: 'PE', name: 'Pernambuco' },
+  { uf: 'PI', name: 'Piauí' },
+  { uf: 'RJ', name: 'Rio de Janeiro' },
+  { uf: 'RN', name: 'Rio Grande do Norte' },
+  { uf: 'RS', name: 'Rio Grande do Sul' },
+  { uf: 'RO', name: 'Rondônia' },
+  { uf: 'RR', name: 'Roraima' },
+  { uf: 'SC', name: 'Santa Catarina' },
+  { uf: 'SP', name: 'São Paulo' },
+  { uf: 'SE', name: 'Sergipe' },
+  { uf: 'TO', name: 'Tocantins' },
+]
+
 type ProductInTheCart = {
   productId: number
   productQuantity: number
@@ -140,19 +184,14 @@ type ProductInTheCart = {
 
 type ProductsInTheCart = ProductInTheCart[]
 
-export interface Product {
-  id: number
-  image: string
-  categories: string[]
-  name: string
-  description: string
-  price: number
-}
-
 interface ProductsContextType {
   products: Product[] | undefined
   productsInTheCart: ProductsInTheCart
-  setProductInTheCart: React.Dispatch<React.SetStateAction<ProductsInTheCart>>
+  handleAddProductInTheCart: (id: number, quantity: number) => void
+  handleRemoveProductFromCart: (id: number) => void
+  handleUpdateProductQuantity: (id: number, quantity: number) => void
+  handleFinishedShopping: () => void
+  brazilianStates: BrazilianStates[]
 }
 
 export const ProductsContext = createContext({} as ProductsContextType)
@@ -164,16 +203,113 @@ interface ProductContextProviderProps {
 export function ProductsContextProvider({
   children,
 }: ProductContextProviderProps) {
-  const [productsInTheCart, setProductInTheCart] = useState<ProductsInTheCart>(
+  const [productsInTheCart, dispatch] = useReducer(
+    (state: ProductsInTheCart, action) => {
+      if (action.type === 'addProductInTheCart') {
+        const existingProduct = Array.isArray(state)
+          ? state.find(
+              (product) => product.productId === action.payload.productId,
+            )
+          : null
+        if (existingProduct) {
+          const newCart = state.map((product) => {
+            if (product.productId === action.payload.productId) {
+              return {
+                ...product,
+                productQuantity:
+                  product.productQuantity + action.payload.productQuantity,
+              }
+            }
+            return product
+          })
+          return newCart
+        } else {
+          // add a null check for the state array before spreading it
+          const newState = Array.isArray(state)
+            ? [...state, action.payload]
+            : [action.payload]
+          return newState
+        }
+      }
+
+      if (action.type === 'updateProductQuantity') {
+        const updatedCart = [...state]
+        const itemIndex = updatedCart.findIndex(
+          (item) => item.productId === action.payload.id,
+        )
+
+        if (itemIndex !== -1) {
+          updatedCart[itemIndex].productQuantity = action.payload.quantity
+        }
+
+        return updatedCart
+      }
+
+      if (action.type === 'removeProductFromCart') {
+        return state.filter((item) => item.productId !== action.payload)
+      }
+
+      if (action.type === 'clearCart') {
+        return {}
+      }
+
+      return state
+    },
     [],
+    () => {
+      const storedStateAsJSON = localStorage.getItem(
+        '@coffee-delivery:products-in-the-cart-1.0.0',
+      )
+
+      if (storedStateAsJSON) {
+        return JSON.parse(storedStateAsJSON)
+      }
+
+      return []
+    },
   )
+
+  function handleAddProductInTheCart(id, quantity) {
+    dispatch({
+      type: 'addProductInTheCart',
+      payload: { productId: id, productQuantity: quantity },
+    })
+  }
+
+  function handleRemoveProductFromCart(id) {
+    dispatch({ type: 'removeProductFromCart', payload: id })
+  }
+
+  function handleUpdateProductQuantity(id, quantity) {
+    dispatch({
+      type: 'updateProductQuantity',
+      payload: { id, quantity },
+    })
+  }
+
+  function handleFinishedShopping() {
+    dispatch({ type: 'clearCart' })
+  }
+
+  useEffect(() => {
+    const stateJSON = JSON.stringify(productsInTheCart)
+
+    localStorage.setItem(
+      '@coffee-delivery:products-in-the-cart-1.0.0',
+      stateJSON,
+    )
+  }, [productsInTheCart])
 
   return (
     <ProductsContext.Provider
       value={{
         products,
+        brazilianStates,
         productsInTheCart,
-        setProductInTheCart,
+        handleAddProductInTheCart,
+        handleRemoveProductFromCart,
+        handleUpdateProductQuantity,
+        handleFinishedShopping,
       }}
     >
       {children}

@@ -8,9 +8,28 @@ import {
   SuccessMessage,
   TimerIcon,
 } from './styles'
+import { useLocation } from 'react-router-dom'
 import SuccessImage from '../../assets/success.svg'
 
 export function Success() {
+  const location = useLocation()
+  const formData = location.state?.formData
+
+  const getPaymentMethodName = (value) => {
+    switch (value) {
+      case 'credit-card':
+        return 'Cartão de crédito'
+      case 'debit-card':
+        return 'Cartão de débito'
+      case 'money':
+        return 'Dinheiro'
+      default:
+        return ''
+    }
+  }
+
+  const paymentMethodName = getPaymentMethodName(formData.paymentMethod)
+
   return (
     <>
       <Header />
@@ -25,9 +44,11 @@ export function Success() {
               </MapIcon>
               <div>
                 <p>
-                  Entrega em <span>Rua João Daniel Martinelli, 102</span>
+                  Entrega em Rua <span>{formData.street}</span>
                 </p>
-                <p>Farrapos - Porto Alegre, RS</p>
+                <p>
+                  {formData.district} - {formData.city}, {formData.state}
+                </p>
               </div>
             </div>
             <div>
@@ -48,7 +69,7 @@ export function Success() {
               <div>
                 <p>Pagamento na entrega</p>
                 <p>
-                  <span>Cartão de Crédito</span>
+                  <span>{paymentMethodName}</span>
                 </p>
               </div>
             </div>

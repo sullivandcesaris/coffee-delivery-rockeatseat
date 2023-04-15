@@ -1,4 +1,8 @@
 import { ShoppingCart } from 'phosphor-react'
+import { QuantityInput } from '../../../../components/QuantityInput'
+import { useContext, useState } from 'react'
+import { ProductsContext } from '../../../../contexts/ProductsContext'
+
 import {
   ProductCategory,
   ProductCategoryContainer,
@@ -7,12 +11,8 @@ import {
   ProductsInsertInCart,
   ProductsPrice,
 } from './styles'
-import { QuantityInput } from '../../../../components/QuantityInput'
-import { useContext, useState } from 'react'
-import { ProductsContext } from '../../../../contexts/ProductsContext'
 
 interface ProductsProps {
-  key: number
   id: number
   image: string
   categories: string[]
@@ -22,7 +22,6 @@ interface ProductsProps {
 }
 
 export function ProductsTemplate({
-  key,
   id,
   image,
   categories,
@@ -31,20 +30,14 @@ export function ProductsTemplate({
   price,
 }: ProductsProps) {
   const [productPrice, setProductPrice] = useState(price)
+
   const [quantity, setQuantity] = useState(1)
 
-  const { productsInTheCart, setProductInTheCart } = useContext(ProductsContext)
+  const { handleAddProductInTheCart } = useContext(ProductsContext)
 
   function setPrice(quantity: number) {
     setQuantity(quantity)
     setProductPrice(price * quantity)
-  }
-
-  function handleAddProductInTheCart() {
-    setProductInTheCart([
-      ...productsInTheCart,
-      { productId: id, productQuantity: quantity },
-    ])
   }
 
   return (
@@ -61,7 +54,9 @@ export function ProductsTemplate({
         <span>R$</span>
         <ProductsPrice>{productPrice.toFixed(2)}</ProductsPrice>
         <QuantityInput setPrice={setPrice} />
-        <ProductsInsertInCart onClick={handleAddProductInTheCart}>
+        <ProductsInsertInCart
+          onClick={() => handleAddProductInTheCart(id, quantity)}
+        >
           <ShoppingCart weight="fill" />
         </ProductsInsertInCart>
       </ProductsFooter>

@@ -10,7 +10,7 @@ export const BackgroundImage = styled.div`
 export const BannerContainer = styled.div`
   width: 82.5rem;
   margin: auto;
-  padding: 15.75rem 0;
+  padding: 20.75rem 0 15.75rem 0;
 
   display: flex;
   gap: 3.5rem;

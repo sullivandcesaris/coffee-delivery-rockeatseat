@@ -3,6 +3,7 @@ import styled from 'styled-components'
 export const HeaderContainer = styled.header`
   position: fixed;
   width: 100%;
+  z-index: 99;
   background-color: ${(props) => props.theme['base-background']};
 `
 export const HeaderContent = styled.div`
