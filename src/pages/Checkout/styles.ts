@@ -77,10 +77,28 @@ export const AddressFormCheckout = styled.form`
     border-radius: 4px;
     font-size: 0.875rem;
   }
+
+  select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.75rem;
+    margin: 0.5rem 0.375rem;
+    height: 2.625rem;
+    background: ${(props) => props.theme['base-input']};
+    border: 1px solid ${(props) => props.theme['base-button']};
+    border-radius: 4px;
+    font-size: 0.875rem;
+
+    option {
+      font-size: 0.875rem;
+    }
+  }
 `
 
 export const W1Field = styled.div`
-  width: calc(10% - 0.75rem);
+  display: flex;
+  flex-direction: column;
+  width: calc(15% - 0.75rem);
   text-align: center;
   margin: 0 0.375rem;
 
@@ -90,6 +108,8 @@ export const W1Field = styled.div`
 `
 
 export const W4Field = styled.div`
+  display: flex;
+  flex-direction: column;
   width: calc(40% - 0.75rem);
   margin: 0 0.375rem;
 
@@ -99,7 +119,9 @@ export const W4Field = styled.div`
 `
 
 export const W5Field = styled.div`
-  width: calc(50% - 0.75rem);
+  display: flex;
+  flex-direction: column;
+  width: calc(45% - 0.75rem);
   margin: 0 0.375rem;
 
   @media (max-width: 768px) {
@@ -108,6 +130,8 @@ export const W5Field = styled.div`
 `
 
 export const W6Field = styled.div`
+  display: flex;
+  flex-direction: column;
   width: calc(60% - 0.75rem);
   margin: 0 0.375rem;
 
@@ -117,6 +141,8 @@ export const W6Field = styled.div`
 `
 
 export const W10Field = styled.div`
+  display: flex;
+  flex-direction: column;
   width: 100%;
   margin: 0 0.375rem;
 
@@ -229,9 +255,14 @@ export const ProductsSideFooter = styled.div`
     text-transform: uppercase;
 
     cursor: pointer;
+
+    :disabled {
+      filter: opacity(0.7);
+      cursor: not-allowed;
+    }
   }
 
-  button:hover {
+  button:not([disabled]):hover {
     background: ${(props) => props.theme['yellow-700']};
   }
 `
@@ -241,4 +272,15 @@ export const TotalCheckout = styled.div`
     font-size: 1.25rem;
     font-weight: 700;
   }
+`
+export const ErrorMessage = styled.span`
+  position: relative;
+  background-color: rgba(255, 245, 245);
+  color: rgba(197, 48, 48);
+  padding: 0.75rem 1rem;
+  margin: 0.5rem;
+  border: 1px solid;
+  border-radius: 0.25rem;
+  border-color: rgba(252, 129, 129);
+  z-index: 0;
 `

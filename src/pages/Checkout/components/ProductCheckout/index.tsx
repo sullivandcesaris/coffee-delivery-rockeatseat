@@ -28,45 +28,19 @@ export function ProductCheckout({
   price,
   quantityInTheCart,
 }: ProductsProps) {
-  const { productsInTheCart, setProductInTheCart } = useContext(ProductsContext)
+  const { handleRemoveProductFromCart, handleUpdateProductQuantity } =
+    useContext(ProductsContext)
 
   const [productPrice, setProductPrice] = useState(price)
   const [quantity, setQuantity] = useState(1)
 
   useEffect(() => {
-    const existingCartItemIndex = productsInTheCart.findIndex(
-      (item) => item.productId === id,
-    )
-
-    if (existingCartItemIndex !== -1) {
-      const updatedCart = [...productsInTheCart]
-      updatedCart[existingCartItemIndex] = {
-        ...updatedCart[existingCartItemIndex],
-        productQuantity: quantity,
-      }
-      setProductInTheCart(updatedCart)
-    } else {
-      setProductInTheCart([
-        ...productsInTheCart,
-        {
-          productId: id,
-          productQuantity: quantity,
-        },
-      ])
-    }
+    handleUpdateProductQuantity(id, quantity)
   }, [quantity])
 
   function setPrice(quantity: number) {
     setQuantity(quantity)
     setProductPrice(price * quantity)
-  }
-
-  function removeCartItem(productId: number) {
-    // Filtra o array productsInTheCart para remover o objeto com o productId correspondente
-    const updatedCart = productsInTheCart.filter(
-      (item) => item.productId !== productId,
-    )
-    setProductInTheCart(updatedCart)
   }
 
   return (
@@ -79,7 +53,7 @@ export function ProductCheckout({
             setPrice={setPrice}
             quantityInTheCart={quantityInTheCart}
           />
-          <RemoveProduct onClick={() => removeCartItem(id)}>
+          <RemoveProduct onClick={() => handleRemoveProductFromCart(id)}>
             <Trash size={16} /> Remover
           </RemoveProduct>
         </div>

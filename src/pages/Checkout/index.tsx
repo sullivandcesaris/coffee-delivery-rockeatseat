@@ -1,6 +1,7 @@
-import { Header } from '../../components/Header'
-import { ProductCheckout } from './components/ProductCheckout'
+import { useContext } from 'react'
+import { Product, ProductsContext } from '../../contexts/ProductsContext'
 import { useForm } from 'react-hook-form'
+import { useNavigate } from 'react-router-dom'
 import {
   Bank,
   CreditCard,
@@ -8,11 +9,14 @@ import {
   MapPin,
   Money,
 } from 'phosphor-react'
+import { Header } from '../../components/Header'
+import { ProductCheckout } from './components/ProductCheckout'
 import {
   Address,
   AddressFormCheckout,
   ButtonMethod,
   CheckoutContainer,
+  ErrorMessage,
   PaymentCheckout,
   PaymentsMethods,
   ProductsSide,
@@ -24,17 +28,30 @@ import {
   W5Field,
   W6Field,
 } from './styles'
-import { useContext } from 'react'
-import { Product, ProductsContext } from '../../contexts/ProductsContext'
 
 export function Checkout() {
-  const { productsInTheCart, products } = useContext(ProductsContext)
-  const { register } = useForm()
+  const {
+    brazilianStates,
+    products,
+    productsInTheCart,
+    handleFinishedShopping,
+  } = useContext(ProductsContext)
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm()
+  const navigate = useNavigate()
+
+  function handleCreateNewPurchase(data: any) {
+    handleFinishedShopping()
+    navigate('/success', { state: { formData: data } })
+  }
 
   const productsWithQuantity = products?.map((product) => {
-    const productInCart = productsInTheCart.find(
-      (item) => item.productId === product.id,
-    )
+    const productInCart = Array.isArray(productsInTheCart)
+      ? productsInTheCart.find((item) => item.productId === product.id)
+      : null
     if (productInCart) {
       return { ...product, quantity: productInCart.productQuantity }
     }
@@ -59,6 +76,8 @@ export function Checkout() {
     return totalPrice
   }
 
+  const isSubmitDisabled = !productsWithQuantityFiltered.length > 0
+
   return (
     <>
       <Header />
@@ -73,29 +92,52 @@ export function Checkout() {
                 <span>Informe o endereço onde deseja receber seu pedido</span>
               </div>
             </div>
-            <AddressFormCheckout>
+            <AddressFormCheckout
+              id="purchaseData"
+              onSubmit={handleSubmit(handleCreateNewPurchase)}
+            >
               <W4Field>
                 <input
-                  type="number"
+                  type="text"
                   id=""
-                  placeholder="CEP"
-                  {...register('postal-code')}
+                  placeholder="CEP (xxxxx-xxx)"
+                  {...register('postalCode', {
+                    required: 'CEP é obrigatório',
+                    pattern: {
+                      value: /^[0-9]{5}-[0-9]{3}$/,
+                      message: 'CEP inválido',
+                    },
+                  })}
                 />
+                {errors.postalCode && (
+                  <ErrorMessage>{errors.postalCode.message}</ErrorMessage>
+                )}
               </W4Field>
               <W10Field>
                 <input
                   type="text"
                   id=""
                   placeholder="Endereço"
-                  {...register('street')}
+                  {...register('street', {
+                    required: 'Endereço é obrigatório',
+                  })}
                 />
+                {errors.street && (
+                  <ErrorMessage>{errors.street.message}</ErrorMessage>
+                )}
               </W10Field>
               <W4Field>
                 <input
                   type="number"
                   id=""
                   placeholder="Número"
-                  {...register('number')}
+                  {...register('number', {
+                    required: 'Numero é obrigatório',
+                    pattern: {
+                      value: /^\d+$/,
+                      message: 'Numero inválido',
+                    },
+                  })}
                 />
               </W4Field>
               <W6Field>
@@ -106,12 +148,19 @@ export function Checkout() {
                   {...register('addition')}
                 />
               </W6Field>
+              <W10Field>
+                {errors.number && (
+                  <ErrorMessage>{errors.number.message}</ErrorMessage>
+                )}
+              </W10Field>
               <W4Field>
                 <input
                   type="text"
                   id=""
                   placeholder="Bairro"
-                  {...register('district')}
+                  {...register('district', {
+                    required: 'Bairro é obrigatório',
+                  })}
                 />
               </W4Field>
               <W5Field>
@@ -119,18 +168,34 @@ export function Checkout() {
                   type="text"
                   id=""
                   placeholder="Cidade"
-                  {...register('city')}
+                  {...register('city', {
+                    required: 'Cidade é obrigatório',
+                  })}
                 />
               </W5Field>
               <W1Field>
-                <input
-                  type="text"
-                  id=""
-                  placeholder="UF"
-                  maxLength={2}
-                  {...register('state')}
-                />
+                <select
+                  {...register('state', { required: 'UF é obrigatório' })}
+                >
+                  <option value="">UF</option>
+                  {brazilianStates.map((state) => (
+                    <option key={state.uf} value={state.uf}>
+                      {state.uf}
+                    </option>
+                  ))}
+                </select>
               </W1Field>
+              <W10Field>
+                {errors.district && (
+                  <ErrorMessage>{errors.district.message}</ErrorMessage>
+                )}
+                {errors.city && (
+                  <ErrorMessage>{errors.city.message}</ErrorMessage>
+                )}
+                {errors.state && (
+                  <ErrorMessage>{errors.state.message}</ErrorMessage>
+                )}
+              </W10Field>
             </AddressFormCheckout>
           </Address>
           <PaymentCheckout>
@@ -148,8 +213,10 @@ export function Checkout() {
               <input
                 type="radio"
                 id="creditCard"
-                name="payment-method"
                 value="credit-card"
+                {...register('paymentMethod', {
+                  required: 'Selecione uma opção',
+                })}
               />
               <ButtonMethod htmlFor="creditCard">
                 <CreditCard size={22} /> cartão de crédito
@@ -157,8 +224,10 @@ export function Checkout() {
               <input
                 type="radio"
                 id="debitCard"
-                name="payment-method"
                 value="debit-card"
+                {...register('paymentMethod', {
+                  required: 'Selecione uma opção',
+                })}
               />
               <ButtonMethod htmlFor="debitCard">
                 <Bank size={22} /> cartão de débito
@@ -166,13 +235,18 @@ export function Checkout() {
               <input
                 type="radio"
                 id="money"
-                name="payment-method"
                 value="money"
+                {...register('paymentMethod', {
+                  required: 'Selecione uma opção',
+                })}
               />
               <ButtonMethod htmlFor="money">
                 <Money size={22} />
                 dinheiro
               </ButtonMethod>
+              {errors.paymentMethod && (
+                <ErrorMessage>{errors.paymentMethod.message}</ErrorMessage>
+              )}
             </PaymentsMethods>
           </PaymentCheckout>
         </div>
@@ -210,9 +284,13 @@ export function Checkout() {
                 <span>Total</span>
                 <span>R$ {(calculateTotalPrice() + 3.5).toFixed(2)}</span>
               </TotalCheckout>
-              <a href="/success">
-                <button>confirmar pedido</button>
-              </a>
+              <button
+                type="submit"
+                form="purchaseData"
+                disabled={isSubmitDisabled}
+              >
+                confirmar pedido
+              </button>
             </ProductsSideFooter>
           </ProductsSide>
         </div>
